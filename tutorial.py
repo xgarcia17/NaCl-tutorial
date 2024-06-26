@@ -1,14 +1,16 @@
-'''
-GOAL:   To familiarize myself with the workings of ASE, generating a simulation, and running a simulation.
-HOW:    Take the code from PySAGES water example and refit it to work for NaCl unit cells.
-'''
-
 import numpy as np
 from ase import Atoms, units
 from ase.constraints import FixBondLengths
 from ase.io.trajectory import Trajectory
 from ase.md import Langevin
 from ase.calculators.vasp import Vasp
+import os
+
+'''
+GOAL:   To familiarize myself with the workings of ASE, generating a simulation, and running a simulation.
+HOW:    Take the code from PySAGES water example and refit it to work for NaCl unit cells.
+'''
+
 
 rNaCl = 2.8    # distasnce between Na and Cl atoms in Angstroms
 angleNaCl = 180
@@ -43,8 +45,12 @@ def generate_simulation(tag="custom_NaCl", write_output=True):
     calc.initialize(atoms)
     atoms.set_calculator(calc)
     calc.write_input(atoms)
+
     logfile = tag + ".log" if write_output else None
+    if os.path.isfile("./"+logfile):    # if the logfile exists, delete it, then let Langevin recreate it. Why? Because Longevin appends to file.
+        os.remove("./"+logfile)
     dyn = Langevin(atoms, 1 * units.fs, temperature_K=T, friction=0.01, logfile=logfile)
+
 
     if write_output:
         traj = Trajectory(tag + ".traj", "w", atoms)
