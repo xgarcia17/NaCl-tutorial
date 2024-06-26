@@ -4,7 +4,6 @@ from ase.constraints import FixBondLengths
 from ase.io.trajectory import Trajectory
 from ase.md import Langevin
 from ase.calculators.vasp import Vasp
-import os
 
 '''
 GOAL:   To familiarize myself with the workings of ASE, generating a simulation, and running a simulation.
@@ -47,8 +46,9 @@ def generate_simulation(tag="custom_NaCl", write_output=True):
     calc.write_input(atoms)
 
     logfile = tag + ".log" if write_output else None
-    if os.path.isfile("./"+logfile):    # if the logfile exists, delete it, then let Langevin recreate it. Why? Because Longevin appends to file.
-        os.remove("./"+logfile)
+    logfile_obj = open(logfile, 'a')
+    logfile_obj.truncate(0)
+    logfile_obj.close()
     dyn = Langevin(atoms, 1 * units.fs, temperature_K=T, friction=0.01, logfile=logfile)
 
 
